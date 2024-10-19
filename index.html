@@ -1,356 +1,463 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Improved Advanced Sorting Visualization</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f0f0;
-            padding: 20px;
-        }
-        #container {
-            display: flex;
-            height: 300px;
-            width: 90%;
-            align-items: flex-end;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-        .bar {
-            flex-grow: 1;
-            background-color: #3498db;
-            margin: 0 1px;
-            transition: height 0.1s ease;
-        }
-        .comparing { background-color: #e74c3c; }
-        .sorted { background-color: #2ecc71; }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .control-group {
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        #speed-control { width: 200px; }
-        .icon {
-            font-size: 24px;
-            vertical-align: middle;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #comparison-counter {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f0f0f0;
+        padding: 20px;
+      }
+      #container {
+        display: flex;
+        height: 300px;
+        width: 90%;
+        align-items: flex-end;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+      .bar {
+        flex-grow: 1;
+        background-color: #3498db;
+        margin: 0 1px;
+        transition: height 0.1s ease;
+      }
+      .comparing {
+        background-color: #e74c3c;
+      }
+      .sorted {
+        background-color: #2ecc71;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .control-group {
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      #speed-control {
+        width: 200px;
+      }
+      .icon {
+        font-size: 24px;
+        vertical-align: middle;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      #comparison-counter {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Improved Advanced Sorting Visualization</h1>
     <div id="comparison-counter">Comparisons: 0</div>
     <div id="container"></div>
     <div class="controls">
-        <div class="control-group">
-            <h3>Speed</h3>
-            <span class="icon">🐢</span>
-            <input type="range" id="speed-control" min="1" max="100" value="50">
-            <span class="icon">🐰</span>
-        </div>
-        <div class="control-group">
-            <h3>Sorting Algorithm</h3>
-            <label><input type="radio" name="algorithm" value="bubble" checked> Bubble Sort</label><br>
-            <label><input type="radio" name="algorithm" value="selection"> Selection Sort</label><br>
-            <label><input type="radio" name="algorithm" value="insertion"> Insertion Sort</label><br>
-            <label><input type="radio" name="algorithm" value="quick"> Quick Sort</label><br>
-            <label><input type="radio" name="algorithm" value="merge"> Merge Sort</label>
-        </div>
-        <div class="control-group">
-            <h3>Initial Configuration</h3>
-            <label><input type="radio" name="config" value="random" checked> Random</label><br>
-            <label><input type="radio" name="config" value="nearly-sorted"> Nearly Sorted</label><br>
-            <label><input type="radio" name="config" value="reversed"> Reversed</label>
-        </div>
+      <div class="control-group">
+        <h3>Speed</h3>
+        <span class="icon">🐢</span>
+        <input type="range" id="speed-control" min="1" max="100" value="50" />
+        <span class="icon">🐰</span>
+      </div>
+      <div class="control-group">
+        <h3>Sorting Algorithm</h3>
+        <label
+          ><input type="radio" name="algorithm" value="bubble" checked /> Bubble
+          Sort</label
+        ><br />
+        <label
+          ><input type="radio" name="algorithm" value="selection" /> Selection
+          Sort</label
+        ><br />
+        <label
+          ><input type="radio" name="algorithm" value="insertion" /> Insertion
+          Sort</label
+        ><br />
+        <label
+          ><input type="radio" name="algorithm" value="quick" /> Quick
+          Sort</label
+        ><br />
+        <label
+          ><input type="radio" name="algorithm" value="merge" /> Merge
+          Sort</label
+        >
+      </div>
+      <div class="control-group">
+        <h3>Initial Configuration</h3>
+        <label
+          ><input type="radio" name="config" value="random" checked />
+          Random</label
+        ><br />
+        <label
+          ><input type="radio" name="config" value="nearly-sorted" /> Nearly
+          Sorted</label
+        ><br />
+        <label
+          ><input type="radio" name="config" value="reversed" /> Reversed</label
+        >
+      </div>
     </div>
     <div>
-        <button id="start">Start Sorting</button>
-        <button id="reset">Reset</button>
+      <button id="reset">Reset</button>
+      <button id="pause-play">Play</button>
+      <button id="next-step" disabled>Next Step</button>
+      <button id="start">Start Sorting</button>
     </div>
+    <div id="array-display"></div>
 
     <script>
-        const container = document.getElementById('container');
-        const speedControl = document.getElementById('speed-control');
-        const startButton = document.getElementById('start');
-        const resetButton = document.getElementById('reset');
-        const comparisonCounter = document.getElementById('comparison-counter');
-        let bars = [];
-        let sorting = false;
-        let speed = 100 - speedControl.value;
-        let comparisons = 0;
-        let animationId = null;
+      const container = document.getElementById("container");
+      const speedControl = document.getElementById("speed-control");
+      const startButton = document.getElementById("start");
+      const resetButton = document.getElementById("reset");
+      const comparisonCounter = document.getElementById("comparison-counter");
+      // At the beginning of the script
+      let bars = Array(50)
+        .fill()
+        .map(() => ({ value: 0 }));
+      let steps = [];
+      let currentStep = 0;
+      let isPaused = true;
 
-        function createBars() {
-            container.innerHTML = '';
-            bars = [];
-            const config = document.querySelector('input[name="config"]:checked').value;
-            for (let i = 0; i < 100; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'bar';
-                let height;
-                switch (config) {
-                    case 'nearly-sorted':
-                        height = i * 3 + Math.floor(Math.random() * 20) - 10;
-                        break;
-                    case 'reversed':
-                        height = 300 - i * 3;
-                        break;
-                    default: // random
-                        height = Math.floor(Math.random() * 280) + 20;
-                }
-                height = Math.max(10, Math.min(300, height)); // Ensure height is between 10 and 300
-                bar.style.height = `${height}px`;
-                container.appendChild(bar);
-                bars.push({ element: bar, value: height });
-            }
+      let sorting = false;
+      let speed = 100 - speedControl.value;
+      let comparisons = 0;
+      let animationId = null;
+
+      // Modified createBars function
+      function createBars() {
+        container.innerHTML = "";
+        bars = [];
+        const config = document.querySelector(
+          'input[name="config"]:checked'
+        ).value;
+        for (let i = 0; i < bars.length; i++) {
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          let height;
+          switch (config) {
+            case "nearly-sorted":
+              height = i * 3 + Math.floor(Math.random() * 20) - 10;
+              break;
+            case "reversed":
+              height = 300 - i * 3;
+              break;
+            default: // random
+              height = Math.floor(Math.random() * 280) + 20;
+          }
+          height = Math.max(10, Math.min(300, height)); // Ensure height is between 10 and 300
+          bar.style.height = `${height}px`;
+          container.appendChild(bar);
+          bars.push({ element: bar, value: height });
         }
+        updateArrayDisplay();
+      }
 
-        function swap(array, i, j) {
-            const temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
+      // New function to update array display
+      function updateArrayDisplay() {
+        const arrayDisplay = document.getElementById("array-display");
+        arrayDisplay.textContent = bars.map((bar) => bar.value).join(", ");
+      }
+
+      function swap(array, i, j) {
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+
+      function compare(a, b) {
+        comparisons++;
+        return a - b;
+      }
+
+      // Modified sorting functions (example for bubbleSort, apply similar changes to others)
+      function bubbleSort(array) {
+        const steps = [];
+        const n = array.length;
+        for (let i = 0; i < n - 1; i++) {
+          for (let j = 0; j < n - i - 1; j++) {
+            steps.push({
+              type: "compare",
+              indices: [j, j + 1],
+              array: JSON.parse(JSON.stringify(array)),
+              comparisons: comparisons,
+            });
+            if (compare(array[j].value, array[j + 1].value) > 0) {
+              swap(array, j, j + 1);
+              steps.push({
+                type: "swap",
+                indices: [j, j + 1],
+                array: JSON.parse(JSON.stringify(array)),
+                comparisons: comparisons,
+              });
+            }
+          }
+          steps.push({
+            type: "sorted",
+            index: n - i - 1,
+            array: JSON.parse(JSON.stringify(array)),
+            comparisons: comparisons,
+          });
         }
-
-        function compare(a, b) {
-            comparisons++;
-            return a - b;
-        }
-
-        function bubbleSort(array) {
-            const steps = [];
-            const n = array.length;
-            for (let i = 0; i < n - 1; i++) {
-                for (let j = 0; j < n - i - 1; j++) {
-                    steps.push({ type: 'compare', indices: [j, j + 1] });
-                    if (compare(array[j].value, array[j + 1].value) > 0) {
-                        swap(array, j, j + 1);
-                        steps.push({ type: 'swap', indices: [j, j + 1] });
-                    }
-                }
-                steps.push({ type: 'sorted', index: n - i - 1 });
-            }
-            steps.push({ type: 'sorted', index: 0 });
-            return steps;
-        }
-
-        function selectionSort(array) {
-            const steps = [];
-            const n = array.length;
-            for (let i = 0; i < n - 1; i++) {
-                let minIdx = i;
-                for (let j = i + 1; j < n; j++) {
-                    steps.push({ type: 'compare', indices: [minIdx, j] });
-                    if (compare(array[j].value, array[minIdx].value) < 0) {
-                        minIdx = j;
-                    }
-                }
-                if (minIdx !== i) {
-                    swap(array, i, minIdx);
-                    steps.push({ type: 'swap', indices: [i, minIdx] });
-                }
-                steps.push({ type: 'sorted', index: i });
-            }
-            steps.push({ type: 'sorted', index: n - 1 });
-            return steps;
-        }
-
-        function insertionSort(array) {
-            const steps = [];
-            const n = array.length;
-            for (let i = 1; i < n; i++) {
-                let key = array[i].value;
-                let j = i - 1;
-                steps.push({ type: 'compare', indices: [j, i] });
-                while (j >= 0 && compare(array[j].value, key) > 0) {
-                    array[j + 1].value = array[j].value;
-                    steps.push({ type: 'swap', indices: [j, j + 1] });
-                    j--;
-                    if (j >= 0) {
-                        steps.push({ type: 'compare', indices: [j, j + 1] });
-                    }
-                }
-                array[j + 1].value = key;
-                steps.push({ type: 'sorted', index: i });
-            }
-            return steps;
-        }
-
-        function quickSort(array) {
-            const steps = [];
-            function quickSortHelper(low, high) {
-                if (low < high) {
-                    const pi = partition(array, low, high, steps);
-                    quickSortHelper(low, pi - 1);
-                    quickSortHelper(pi + 1, high);
-                }
-            }
-            quickSortHelper(0, array.length - 1);
-            return steps;
-        }
-
-        function partition(array, low, high, steps) {
-            const pivot = array[high].value;
-            let i = low - 1;
-            for (let j = low; j < high; j++) {
-                steps.push({ type: 'compare', indices: [j, high] });
-                if (compare(array[j].value, pivot) < 0) {
-                    i++;
-                    swap(array, i, j);
-                    steps.push({ type: 'swap', indices: [i, j] });
-                }
-            }
-            swap(array, i + 1, high);
-            steps.push({ type: 'swap', indices: [i + 1, high] });
-            steps.push({ type: 'sorted', index: i + 1 });
-            return i + 1;
-        }
-
-        function mergeSort(array) {
-            const steps = [];
-            function mergeSortHelper(array, left, right) {
-                if (left < right) {
-                    const mid = Math.floor((left + right) / 2);
-                    mergeSortHelper(array, left, mid);
-                    mergeSortHelper(array, mid + 1, right);
-                    merge(array, left, mid, right, steps);
-                }
-            }
-            mergeSortHelper(array, 0, array.length - 1);
-            return steps;
-        }
-
-        function merge(array, left, mid, right, steps) {
-            const n1 = mid - left + 1;
-            const n2 = right - mid;
-            const L = new Array(n1);
-            const R = new Array(n2);
-
-            for (let i = 0; i < n1; i++) L[i] = array[left + i].value;
-            for (let j = 0; j < n2; j++) R[j] = array[mid + 1 + j].value;
-
-            let i = 0, j = 0, k = left;
-            while (i < n1 && j < n2) {
-                steps.push({ type: 'compare', indices: [left + i, mid + 1 + j] });
-                if (compare(L[i], R[j]) <= 0) {
-                    array[k].value = L[i];
-                    i++;
-                } else {
-                    array[k].value = R[j];
-                    j++;
-                }
-                steps.push({ type: 'update', index: k, value: array[k].value });
-                k++;
-            }
-
-            while (i < n1) {
-                array[k].value = L[i];
-                steps.push({ type: 'update', index: k, value: array[k].value });
-                i++;
-                k++;
-            }
-
-            while (j < n2) {
-                array[k].value = R[j];
-                steps.push({ type: 'update', index: k, value: array[k].value });
-                j++;
-                k++;
-            }
-
-            for (let m = left; m <= right; m++) {
-                steps.push({ type: 'sorted', index: m });
-            }
-        }
-
-        async function animateSteps(steps) {
-            for (const step of steps) {
-                if (!sorting) break;
-                switch (step.type) {
-                    case 'compare':
-                        bars[step.indices[0]].element.classList.add('comparing');
-                        bars[step.indices[1]].element.classList.add('comparing');
-                        break;
-                    case 'swap':
-                        [bars[step.indices[0]], bars[step.indices[1]]] = [bars[step.indices[1]], bars[step.indices[0]]];
-                        container.insertBefore(bars[step.indices[0]].element, bars[step.indices[1]].element);
-                        break;
-                    case 'update':
-                        bars[step.index].value = step.value;
-                        bars[step.index].element.style.height = `${step.value}px`;
-                        break;
-                    case 'sorted':
-                        bars[step.index].element.classList.add('sorted');
-                        break;
-                }
-                await new Promise(resolve => setTimeout(resolve, speed));
-                if (step.type === 'compare') {
-                    bars[step.indices[0]].element.classList.remove('comparing');
-                    bars[step.indices[1]].element.classList.remove('comparing');
-                }
-                comparisonCounter.textContent = `Comparisons: ${comparisons}`;
-            }
-            sorting = false;
-            startButton.disabled = false;
-        }
-
-        speedControl.addEventListener('input', () => {
-            speed = 100 - speedControl.value;
+        steps.push({
+          type: "sorted",
+          index: 0,
+          array: JSON.parse(JSON.stringify(array)),
+          comparisons: comparisons,
         });
+        return steps;
+      }
 
-        startButton.addEventListener('click', async () => {
-            if (sorting) return;
-            sorting = true;
-            startButton.disabled = true;
-            comparisons = 0;
-            comparisonCounter.textContent = 'Comparisons: 0';
-            const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
-            const arrayCopy = bars.map(bar => ({ value: bar.value }));
-            let steps;
-            switch (algorithm) {
-                case 'bubble': steps = bubbleSort(arrayCopy); break;
-                case 'selection': steps = selectionSort(arrayCopy); break;
-                case 'insertion': steps = insertionSort(arrayCopy); break;
-                case 'quick': steps = quickSort(arrayCopy); break;
-                case 'merge': steps = mergeSort(arrayCopy); break;
+      function selectionSort(array) {
+        const steps = [];
+        const n = array.length;
+        for (let i = 0; i < n - 1; i++) {
+          let minIdx = i;
+          for (let j = i + 1; j < n; j++) {
+            steps.push({ type: "compare", indices: [minIdx, j] });
+            if (compare(array[j].value, array[minIdx].value) < 0) {
+              minIdx = j;
             }
-            animateSteps(steps);
-        });
+          }
+          if (minIdx !== i) {
+            swap(array, i, minIdx);
+            steps.push({ type: "swap", indices: [i, minIdx] });
+          }
+          steps.push({ type: "sorted", index: i });
+        }
+        steps.push({ type: "sorted", index: n - 1 });
+        return steps;
+      }
 
-        resetButton.addEventListener('click', () => {
-            sorting = false;
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
+      function insertionSort(array) {
+        const steps = [];
+        const n = array.length;
+        for (let i = 1; i < n; i++) {
+          let key = array[i].value;
+          let j = i - 1;
+          steps.push({ type: "compare", indices: [j, i] });
+          while (j >= 0 && compare(array[j].value, key) > 0) {
+            array[j + 1].value = array[j].value;
+            steps.push({ type: "swap", indices: [j, j + 1] });
+            j--;
+            if (j >= 0) {
+              steps.push({ type: "compare", indices: [j, j + 1] });
             }
-            createBars();
-            comparisons = 0;
-            comparisonCounter.textContent = 'Comparisons: 0';
-            startButton.disabled = false;
-        });
+          }
+          array[j + 1].value = key;
+          steps.push({ type: "sorted", index: i });
+        }
+        return steps;
+      }
 
+      function quickSort(array) {
+        const steps = [];
+        function quickSortHelper(low, high) {
+          if (low < high) {
+            const pi = partition(array, low, high, steps);
+            quickSortHelper(low, pi - 1);
+            quickSortHelper(pi + 1, high);
+          }
+        }
+        quickSortHelper(0, array.length - 1);
+        return steps;
+      }
+
+      function partition(array, low, high, steps) {
+        const pivot = array[high].value;
+        let i = low - 1;
+        for (let j = low; j < high; j++) {
+          steps.push({ type: "compare", indices: [j, high] });
+          if (compare(array[j].value, pivot) < 0) {
+            i++;
+            swap(array, i, j);
+            steps.push({ type: "swap", indices: [i, j] });
+          }
+        }
+        swap(array, i + 1, high);
+        steps.push({ type: "swap", indices: [i + 1, high] });
+        steps.push({ type: "sorted", index: i + 1 });
+        return i + 1;
+      }
+
+      function mergeSort(array) {
+        const steps = [];
+        function mergeSortHelper(array, left, right) {
+          if (left < right) {
+            const mid = Math.floor((left + right) / 2);
+            mergeSortHelper(array, left, mid);
+            mergeSortHelper(array, mid + 1, right);
+            merge(array, left, mid, right, steps);
+          }
+        }
+        mergeSortHelper(array, 0, array.length - 1);
+        return steps;
+      }
+
+      function merge(array, left, mid, right, steps) {
+        const n1 = mid - left + 1;
+        const n2 = right - mid;
+        const L = new Array(n1);
+        const R = new Array(n2);
+
+        for (let i = 0; i < n1; i++) L[i] = array[left + i].value;
+        for (let j = 0; j < n2; j++) R[j] = array[mid + 1 + j].value;
+
+        let i = 0,
+          j = 0,
+          k = left;
+        while (i < n1 && j < n2) {
+          steps.push({ type: "compare", indices: [left + i, mid + 1 + j] });
+          if (compare(L[i], R[j]) <= 0) {
+            array[k].value = L[i];
+            i++;
+          } else {
+            array[k].value = R[j];
+            j++;
+          }
+          steps.push({ type: "update", index: k, value: array[k].value });
+          k++;
+        }
+
+        while (i < n1) {
+          array[k].value = L[i];
+          steps.push({ type: "update", index: k, value: array[k].value });
+          i++;
+          k++;
+        }
+
+        while (j < n2) {
+          array[k].value = R[j];
+          steps.push({ type: "update", index: k, value: array[k].value });
+          j++;
+          k++;
+        }
+
+        for (let m = left; m <= right; m++) {
+          steps.push({ type: "sorted", index: m });
+        }
+      }
+
+      // Modified animateSteps function
+      async function animateSteps() {
+        if (currentStep >= steps.length) {
+          sorting = false;
+          startButton.disabled = false;
+          nextStepButton.disabled = true;
+          return;
+        }
+
+        const step = steps[currentStep];
+        bars = JSON.parse(JSON.stringify(step.array));
+        comparisons = step.comparisons;
+
+        // ... (rest of the animation logic)
+
+        updateArrayDisplay();
+        comparisonCounter.textContent = `Comparisons: ${comparisons}`;
+
+        currentStep++;
+        if (!isPaused) {
+          setTimeout(animateSteps, speed);
+        }
+      }
+
+      // New function for next step
+      function nextStep() {
+        if (currentStep < steps.length) {
+          animateSteps();
+        }
+      }
+
+      // Modified event listeners
+
+      speedControl.addEventListener("input", () => {
+        speed = 100 - speedControl.value;
+      });
+
+      startButton.addEventListener("click", async () => {
+        if (sorting) return;
+        sorting = true;
+        startButton.disabled = true;
+        pausePlayButton.disabled = false;
+        nextStepButton.disabled = true;
+        comparisons = 0;
+        currentStep = 0;
+        comparisonCounter.textContent = "Comparisons: 0";
+        const algorithm = document.querySelector(
+          'input[name="algorithm"]:checked'
+        ).value;
+        const arrayCopy = JSON.parse(JSON.stringify(bars));
+        let steps;
+        switch (algorithm) {
+          case "bubble":
+            steps = bubbleSort(arrayCopy);
+            break;
+          case "selection":
+            steps = selectionSort(arrayCopy);
+            break;
+          case "insertion":
+            steps = insertionSort(arrayCopy);
+            break;
+          case "quick":
+            steps = quickSort(arrayCopy);
+            break;
+          case "merge":
+            steps = mergeSort(arrayCopy);
+            break;
+        }
+        if (!isPaused) {
+          animateSteps();
+        }
+      });
+
+      // New pause/play button listener
+      pausePlayButton.addEventListener("click", () => {
+        isPaused = !isPaused;
+        pausePlayButton.textContent = isPaused ? "Play" : "Pause";
+        nextStepButton.disabled = !isPaused;
+        if (!isPaused) {
+          animateSteps();
+        }
+      });
+
+      // New next step button listener
+      nextStepButton.addEventListener("click", nextStep);
+
+      // Modified reset button listener
+      resetButton.addEventListener("click", () => {
+        sorting = false;
+        isPaused = true;
+        currentStep = 0;
+        steps = [];
+        pausePlayButton.textContent = "Play";
+        pausePlayButton.disabled = true;
+        nextStepButton.disabled = true;
+        startButton.disabled = false;
         createBars();
+        comparisons = 0;
+        comparisonCounter.textContent = "Comparisons: 0";
+      });
+
+      createBars();
     </script>
-</body>
+  </body>
 </html>
