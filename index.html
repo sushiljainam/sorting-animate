@@ -117,7 +117,7 @@
     </div>
     <div>
       <button id="reset">Reset</button>
-      <button id="pause-play">Play</button>
+      <button id="pause-play" disabled>Play</button>
       <button id="next-step" disabled>Next Step</button>
       <button id="start">Start Sorting</button>
     </div>
@@ -129,10 +129,12 @@
       const startButton = document.getElementById("start");
       const resetButton = document.getElementById("reset");
       const comparisonCounter = document.getElementById("comparison-counter");
+      const pausePlayButton = document.getElementById("pause-play");
+      const nextStepButton = document.getElementById("next-step");
       // At the beginning of the script
-      let bars = Array(50)
+      let bars = []; /*  Array(50)
         .fill()
-        .map(() => ({ value: 0 }));
+        .map(() => ({ value: 0 })); */
       let steps = [];
       let currentStep = 0;
       let isPaused = true;
@@ -149,7 +151,7 @@
         const config = document.querySelector(
           'input[name="config"]:checked'
         ).value;
-        for (let i = 0; i < bars.length; i++) {
+        for (let i = 0; i < 50; i++) {
           const bar = document.createElement("div");
           bar.className = "bar";
           let height;
