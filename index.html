@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #container {
+            display: flex;
+            height: 300px;
+            align-items: flex-end;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .bar {
+            width: 8px;
+            background-color: #3498db;
+            margin: 0 1px;
+            transition: height 0.3s ease;
+        }
+        .comparing {
+            background-color: #e74c3c;
+        }
+        .frozen {
+            background-color: #2ecc71;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        #speed-control {
+            width: 200px;
+        }
+        .icon {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sorting Visualization</h1>
+    <div id="container"></div>
+    <div id="controls">
+        <span class="icon">🐢</span>
+        <input type="range" id="speed-control" min="1" max="100" value="50">
+        <span class="icon">🐰</span>
+    </div>
+    <button id="start">Start Sorting</button>
+
+    <script>
+        const container = document.getElementById('container');
+        const speedControl = document.getElementById('speed-control');
+        const startButton = document.getElementById('start');
+        let bars = [];
+        let sorting = false;
+        let speed = 100 - speedControl.value;
+
+        function createBars() {
+            container.innerHTML = '';
+            bars = [];
+            for (let i = 0; i < 100; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const height = Math.floor(Math.random() * 280) + 20;
+                bar.style.height = `${height}px`;
+                container.appendChild(bar);
+                bars.push({ element: bar, value: height });
+            }
+        }
+
+        async function bubbleSort() {
+            const n = bars.length;
+            let swapped;
+            for (let i = 0; i < n - 1; i++) {
+                swapped = false;
+                for (let j = 0; j < n - i - 1; j++) {
+                    bars[j].element.classList.add('comparing');
+                    bars[j + 1].element.classList.add('comparing');
+                    await new Promise(resolve => setTimeout(resolve, speed));
+
+                    if (bars[j].value > bars[j + 1].value) {
+                        const temp = bars[j];
+                        bars[j] = bars[j + 1];
+                        bars[j + 1] = temp;
+                        container.insertBefore(bars[j].element, bars[j + 1].element);
+                        swapped = true;
+                    }
+
+                    bars[j].element.classList.remove('comparing');
+                    bars[j + 1].element.classList.remove('comparing');
+                }
+                bars[n - i - 1].element.classList.add('frozen');
+                if (!swapped) break;
+            }
+            sorting = false;
+            startButton.textContent = 'Start Sorting';
+        }
+
+        speedControl.addEventListener('input', () => {
+            speed = 100 - speedControl.value;
+        });
+
+        startButton.addEventListener('click', () => {
+            if (sorting) return;
+            sorting = true;
+            startButton.textContent = 'Sorting...';
+            createBars();
+            bubbleSort();
+        });
+
+        createBars();
+    </script>
+</body>
+</html>
