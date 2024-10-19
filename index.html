@@ -28,6 +28,19 @@
         background-color: #3498db;
         margin: 0 1px;
         transition: height 0.1s ease;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .bar-value {
+        position: absolute;
+        bottom: 0;
+        font-size: 10px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 2px;
+        border-radius: 2px;
       }
       .comparing {
         background-color: #e74c3c;
@@ -167,10 +180,19 @@
           }
           height = Math.max(10, Math.min(300, height)); // Ensure height is between 10 and 300
           bar.style.height = `${height}px`;
+          const valueSpan = document.createElement("span");
+          valueSpan.className = "bar-value";
+          valueSpan.textContent = height;
+          bar.appendChild(valueSpan);
           container.appendChild(bar);
           bars.push({ element: bar, value: height });
         }
         updateArrayDisplay();
+      }
+
+      function updateBarHeight(bar, value) {
+        bar.element.style.height = `${value}px`;
+        bar.element.querySelector('.bar-value').textContent = value;
       }
 
       // New function to update array display
@@ -203,10 +225,12 @@
               comparisons: comparisons,
             });
             if (compare(array[j].value, array[j + 1].value) > 0) {
-              swap(array, j, j + 1);
+              [array[j], array[j + 1]] = [array[j + 1], array[j]];
+            //   swap(array, j, j + 1);
               steps.push({
                 type: "swap",
                 indices: [j, j + 1],
+                values: [array[j].value, array[j + 1].value],
                 array: JSON.parse(JSON.stringify(array)),
                 comparisons: comparisons,
               });
@@ -379,11 +403,14 @@
                 break;
             case 'swap':
                 [bars[step.indices[0]], bars[step.indices[1]]] = [bars[step.indices[1]], bars[step.indices[0]]];
+                updateBarHeight(bars[step.indices[0]], step.values[0]);
+                updateBarHeight(bars[step.indices[1]], step.values[1]);
                 container.insertBefore(bars[step.indices[0]].element, bars[step.indices[1]].element);
                 break;
             case 'update':
-                bars[step.index].value = step.value;
-                bars[step.index].element.style.height = `${step.value}px`;
+                updateBarHeight(bars[step.index], step.value);
+                // bars[step.index].value = step.value;
+                // bars[step.index].element.style.height = `${step.value}px`;
                 break;
             case 'sorted':
                 bars[step.index].element.classList.add('sorted');
@@ -396,7 +423,7 @@
         }
         comparisonCounter.textContent = `Comparisons: ${comparisons}`;
         updateArrayDisplay();
-        comparisonCounter.textContent = `Comparisons: ${comparisons}`;
+        // comparisonCounter.textContent = `Comparisons: ${comparisons}`;
 
         currentStep++;
         if (!isPaused) {
