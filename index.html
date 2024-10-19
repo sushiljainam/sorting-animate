@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Sorting Visualization</title>
+    <title>Improved Advanced Sorting Visualization</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,10 +27,10 @@
             flex-grow: 1;
             background-color: #3498db;
             margin: 0 1px;
-            transition: height 0.3s ease;
+            transition: height 0.1s ease;
         }
         .comparing { background-color: #e74c3c; }
-        .frozen { background-color: #2ecc71; }
+        .sorted { background-color: #2ecc71; }
         .controls {
             display: flex;
             flex-wrap: wrap;
@@ -61,7 +61,7 @@
     </style>
 </head>
 <body>
-    <h1>Advanced Sorting Visualization</h1>
+    <h1>Improved Advanced Sorting Visualization</h1>
     <div id="comparison-counter">Comparisons: 0</div>
     <div id="container"></div>
     <div class="controls">
@@ -101,6 +101,7 @@
         let sorting = false;
         let speed = 100 - speedControl.value;
         let comparisons = 0;
+        let animationId = null;
 
         function createBars() {
             container.innerHTML = '';
@@ -127,150 +128,191 @@
             }
         }
 
-        function swap(i, j) {
-            const temp = bars[i];
-            bars[i] = bars[j];
-            bars[j] = temp;
-            container.insertBefore(bars[i].element, bars[j].element);
+        function swap(array, i, j) {
+            const temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
 
-        function compare(i, j) {
+        function compare(a, b) {
             comparisons++;
-            comparisonCounter.textContent = `Comparisons: ${comparisons}`;
-            return bars[i].value - bars[j].value;
+            return a - b;
         }
 
-        async function bubbleSort() {
-            const n = bars.length;
+        function bubbleSort(array) {
+            const steps = [];
+            const n = array.length;
             for (let i = 0; i < n - 1; i++) {
                 for (let j = 0; j < n - i - 1; j++) {
-                    bars[j].element.classList.add('comparing');
-                    bars[j + 1].element.classList.add('comparing');
-                    await new Promise(resolve => setTimeout(resolve, speed));
-                    if (compare(j, j + 1) > 0) {
-                        swap(j, j + 1);
+                    steps.push({ type: 'compare', indices: [j, j + 1] });
+                    if (compare(array[j].value, array[j + 1].value) > 0) {
+                        swap(array, j, j + 1);
+                        steps.push({ type: 'swap', indices: [j, j + 1] });
                     }
-                    bars[j].element.classList.remove('comparing');
-                    bars[j + 1].element.classList.remove('comparing');
                 }
-                bars[n - i - 1].element.classList.add('frozen');
+                steps.push({ type: 'sorted', index: n - i - 1 });
             }
+            steps.push({ type: 'sorted', index: 0 });
+            return steps;
         }
 
-        async function selectionSort() {
-            const n = bars.length;
+        function selectionSort(array) {
+            const steps = [];
+            const n = array.length;
             for (let i = 0; i < n - 1; i++) {
                 let minIdx = i;
                 for (let j = i + 1; j < n; j++) {
-                    bars[j].element.classList.add('comparing');
-                    await new Promise(resolve => setTimeout(resolve, speed));
-                    if (compare(j, minIdx) < 0) {
-                        bars[minIdx].element.classList.remove('comparing');
+                    steps.push({ type: 'compare', indices: [minIdx, j] });
+                    if (compare(array[j].value, array[minIdx].value) < 0) {
                         minIdx = j;
-                    } else {
-                        bars[j].element.classList.remove('comparing');
                     }
                 }
-                swap(i, minIdx);
-                bars[i].element.classList.add('frozen');
-            }
-            bars[n - 1].element.classList.add('frozen');
-        }
-
-        async function insertionSort() {
-            const n = bars.length;
-            for (let i = 1; i < n; i++) {
-                let j = i - 1;
-                const key = bars[i].value;
-                bars[i].element.classList.add('comparing');
-                while (j >= 0 && compare(j, i) > 0) {
-                    bars[j].element.classList.add('comparing');
-                    await new Promise(resolve => setTimeout(resolve, speed));
-                    swap(j + 1, j);
-                    bars[j + 1].element.classList.remove('comparing');
-                    j--;
+                if (minIdx !== i) {
+                    swap(array, i, minIdx);
+                    steps.push({ type: 'swap', indices: [i, minIdx] });
                 }
-                bars[i].element.classList.remove('comparing');
+                steps.push({ type: 'sorted', index: i });
             }
-            bars.forEach(bar => bar.element.classList.add('frozen'));
+            steps.push({ type: 'sorted', index: n - 1 });
+            return steps;
         }
 
-        async function quickSort(low = 0, high = bars.length - 1) {
-            if (low < high) {
-                const pi = await partition(low, high);
-                await quickSort(low, pi - 1);
-                await quickSort(pi + 1, high);
+        function insertionSort(array) {
+            const steps = [];
+            const n = array.length;
+            for (let i = 1; i < n; i++) {
+                let key = array[i].value;
+                let j = i - 1;
+                steps.push({ type: 'compare', indices: [j, i] });
+                while (j >= 0 && compare(array[j].value, key) > 0) {
+                    array[j + 1].value = array[j].value;
+                    steps.push({ type: 'swap', indices: [j, j + 1] });
+                    j--;
+                    if (j >= 0) {
+                        steps.push({ type: 'compare', indices: [j, j + 1] });
+                    }
+                }
+                array[j + 1].value = key;
+                steps.push({ type: 'sorted', index: i });
             }
-            if (low === 0 && high === bars.length - 1) {
-                bars.forEach(bar => bar.element.classList.add('frozen'));
-            }
+            return steps;
         }
 
-        async function partition(low, high) {
-            const pivot = bars[high].value;
-            bars[high].element.classList.add('comparing');
+        function quickSort(array) {
+            const steps = [];
+            function quickSortHelper(low, high) {
+                if (low < high) {
+                    const pi = partition(array, low, high, steps);
+                    quickSortHelper(low, pi - 1);
+                    quickSortHelper(pi + 1, high);
+                }
+            }
+            quickSortHelper(0, array.length - 1);
+            return steps;
+        }
+
+        function partition(array, low, high, steps) {
+            const pivot = array[high].value;
             let i = low - 1;
             for (let j = low; j < high; j++) {
-                bars[j].element.classList.add('comparing');
-                await new Promise(resolve => setTimeout(resolve, speed));
-                if (compare(j, high) < 0) {
+                steps.push({ type: 'compare', indices: [j, high] });
+                if (compare(array[j].value, pivot) < 0) {
                     i++;
-                    swap(i, j);
+                    swap(array, i, j);
+                    steps.push({ type: 'swap', indices: [i, j] });
                 }
-                bars[j].element.classList.remove('comparing');
             }
-            swap(i + 1, high);
-            bars[high].element.classList.remove('comparing');
+            swap(array, i + 1, high);
+            steps.push({ type: 'swap', indices: [i + 1, high] });
+            steps.push({ type: 'sorted', index: i + 1 });
             return i + 1;
         }
 
-        async function mergeSort(left = 0, right = bars.length - 1) {
-            if (left < right) {
-                const mid = Math.floor((left + right) / 2);
-                await mergeSort(left, mid);
-                await mergeSort(mid + 1, right);
-                await merge(left, mid, right);
+        function mergeSort(array) {
+            const steps = [];
+            function mergeSortHelper(array, left, right) {
+                if (left < right) {
+                    const mid = Math.floor((left + right) / 2);
+                    mergeSortHelper(array, left, mid);
+                    mergeSortHelper(array, mid + 1, right);
+                    merge(array, left, mid, right, steps);
+                }
             }
-            if (left === 0 && right === bars.length - 1) {
-                bars.forEach(bar => bar.element.classList.add('frozen'));
-            }
+            mergeSortHelper(array, 0, array.length - 1);
+            return steps;
         }
 
-        async function merge(left, mid, right) {
+        function merge(array, left, mid, right, steps) {
             const n1 = mid - left + 1;
             const n2 = right - mid;
-            const L = bars.slice(left, mid + 1);
-            const R = bars.slice(mid + 1, right + 1);
+            const L = new Array(n1);
+            const R = new Array(n2);
+
+            for (let i = 0; i < n1; i++) L[i] = array[left + i].value;
+            for (let j = 0; j < n2; j++) R[j] = array[mid + 1 + j].value;
+
             let i = 0, j = 0, k = left;
             while (i < n1 && j < n2) {
-                bars[left + i].element.classList.add('comparing');
-                bars[mid + 1 + j].element.classList.add('comparing');
-                await new Promise(resolve => setTimeout(resolve, speed));
-                if (compare(left + i, mid + 1 + j) <= 0) {
-                    bars[k].value = L[i].value;
-                    bars[k].element.style.height = `${L[i].value}px`;
+                steps.push({ type: 'compare', indices: [left + i, mid + 1 + j] });
+                if (compare(L[i], R[j]) <= 0) {
+                    array[k].value = L[i];
                     i++;
                 } else {
-                    bars[k].value = R[j].value;
-                    bars[k].element.style.height = `${R[j].value}px`;
+                    array[k].value = R[j];
                     j++;
                 }
-                bars[left + i - 1].element.classList.remove('comparing');
-                bars[mid + 1 + j - 1].element.classList.remove('comparing');
+                steps.push({ type: 'update', index: k, value: array[k].value });
                 k++;
             }
+
             while (i < n1) {
-                bars[k].value = L[i].value;
-                bars[k].element.style.height = `${L[i].value}px`;
+                array[k].value = L[i];
+                steps.push({ type: 'update', index: k, value: array[k].value });
                 i++;
                 k++;
             }
+
             while (j < n2) {
-                bars[k].value = R[j].value;
-                bars[k].element.style.height = `${R[j].value}px`;
+                array[k].value = R[j];
+                steps.push({ type: 'update', index: k, value: array[k].value });
                 j++;
                 k++;
             }
+
+            for (let m = left; m <= right; m++) {
+                steps.push({ type: 'sorted', index: m });
+            }
+        }
+
+        async function animateSteps(steps) {
+            for (const step of steps) {
+                if (!sorting) break;
+                switch (step.type) {
+                    case 'compare':
+                        bars[step.indices[0]].element.classList.add('comparing');
+                        bars[step.indices[1]].element.classList.add('comparing');
+                        break;
+                    case 'swap':
+                        [bars[step.indices[0]], bars[step.indices[1]]] = [bars[step.indices[1]], bars[step.indices[0]]];
+                        container.insertBefore(bars[step.indices[0]].element, bars[step.indices[1]].element);
+                        break;
+                    case 'update':
+                        bars[step.index].value = step.value;
+                        bars[step.index].element.style.height = `${step.value}px`;
+                        break;
+                    case 'sorted':
+                        bars[step.index].element.classList.add('sorted');
+                        break;
+                }
+                await new Promise(resolve => setTimeout(resolve, speed));
+                if (step.type === 'compare') {
+                    bars[step.indices[0]].element.classList.remove('comparing');
+                    bars[step.indices[1]].element.classList.remove('comparing');
+                }
+                comparisonCounter.textContent = `Comparisons: ${comparisons}`;
+            }
+            sorting = false;
+            startButton.disabled = false;
         }
 
         speedControl.addEventListener('input', () => {
@@ -281,27 +323,31 @@
             if (sorting) return;
             sorting = true;
             startButton.disabled = true;
-            resetButton.disabled = true;
             comparisons = 0;
             comparisonCounter.textContent = 'Comparisons: 0';
             const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+            const arrayCopy = bars.map(bar => ({ value: bar.value }));
+            let steps;
             switch (algorithm) {
-                case 'bubble': await bubbleSort(); break;
-                case 'selection': await selectionSort(); break;
-                case 'insertion': await insertionSort(); break;
-                case 'quick': await quickSort(); break;
-                case 'merge': await mergeSort(); break;
+                case 'bubble': steps = bubbleSort(arrayCopy); break;
+                case 'selection': steps = selectionSort(arrayCopy); break;
+                case 'insertion': steps = insertionSort(arrayCopy); break;
+                case 'quick': steps = quickSort(arrayCopy); break;
+                case 'merge': steps = mergeSort(arrayCopy); break;
             }
-            sorting = false;
-            startButton.disabled = false;
-            resetButton.disabled = false;
+            animateSteps(steps);
         });
 
         resetButton.addEventListener('click', () => {
-            if (sorting) return;
+            sorting = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
             createBars();
             comparisons = 0;
             comparisonCounter.textContent = 'Comparisons: 0';
+            startButton.disabled = false;
         });
 
         createBars();
