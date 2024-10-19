@@ -371,8 +371,30 @@
         bars = JSON.parse(JSON.stringify(step.array));
         comparisons = step.comparisons;
 
-        // ... (rest of the animation logic)
-
+        // if (!sorting) break;
+        switch (step.type) {
+            case 'compare':
+                bars[step.indices[0]].element.classList.add('comparing');
+                bars[step.indices[1]].element.classList.add('comparing');
+                break;
+            case 'swap':
+                [bars[step.indices[0]], bars[step.indices[1]]] = [bars[step.indices[1]], bars[step.indices[0]]];
+                container.insertBefore(bars[step.indices[0]].element, bars[step.indices[1]].element);
+                break;
+            case 'update':
+                bars[step.index].value = step.value;
+                bars[step.index].element.style.height = `${step.value}px`;
+                break;
+            case 'sorted':
+                bars[step.index].element.classList.add('sorted');
+                break;
+        }
+        await new Promise(resolve => setTimeout(resolve, speed));
+        if (step.type === 'compare') {
+            bars[step.indices[0]].element.classList.remove('comparing');
+            bars[step.indices[1]].element.classList.remove('comparing');
+        }
+        comparisonCounter.textContent = `Comparisons: ${comparisons}`;
         updateArrayDisplay();
         comparisonCounter.textContent = `Comparisons: ${comparisons}`;
 
@@ -383,7 +405,7 @@
       }
 
       // New function for next step
-      function nextStep() {
+      function nextStepCb() {
         if (currentStep < steps.length) {
           animateSteps();
         }
@@ -408,7 +430,7 @@
           'input[name="algorithm"]:checked'
         ).value;
         const arrayCopy = JSON.parse(JSON.stringify(bars));
-        let steps;
+        // let steps;
         switch (algorithm) {
           case "bubble":
             steps = bubbleSort(arrayCopy);
@@ -442,7 +464,7 @@
       });
 
       // New next step button listener
-      nextStepButton.addEventListener("click", nextStep);
+      nextStepButton.addEventListener("click", nextStepCb);
 
       // Modified reset button listener
       resetButton.addEventListener("click", () => {
